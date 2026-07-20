@@ -1,0 +1,136 @@
+<view class="page-shell">
+  <view class="product-header">
+    <image class="product-icon" src="/Icon.png" mode="aspectFill" />
+    <view class="product-copy">
+      <text class="product-name">Bean Pudding</text>
+      <text class="product-kind">拼豆图纸生成器</text>
+    </view>
+    <view class="service-state service-state--{{serviceStatus}}">
+      <view class="service-dot"></view>
+      <text>{{serviceStatusText}}</text>
+    </view>
+  </view>
+
+  <view class="workspace-section">
+    <text class="section-title">图片</text>
+    <button wx:if="{{!imagePath}}" class="image-picker" bindtap="chooseImage">
+      <text class="picker-symbol">+</text>
+      <text class="picker-label">选择图片</text>
+    </button>
+    <view wx:else class="selected-image">
+      <image class="selected-image__preview" src="{{imagePath}}" mode="aspectFit" />
+      <view class="selected-image__footer">
+        <view class="image-meta">
+          <text class="image-name">{{imageName}}</text>
+          <text class="image-detail">{{imageWidth}} × {{imageHeight}} · {{imageSizeText}}</text>
+        </view>
+        <button class="replace-button" bindtap="chooseImage">更换</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="settings-section">
+    <text class="section-title">图纸参数</text>
+
+    <view class="setting-block">
+      <view class="setting-heading">
+        <text class="setting-label">最长边豆数</text>
+        <text class="setting-value">{{maxSize}} 格</text>
+      </view>
+      <view class="segmented-control">
+        <button
+          wx:for="{{sizeOptions}}"
+          wx:key="*this"
+          class="segment {{maxSize === item ? 'segment--active' : ''}}"
+          data-value="{{item}}"
+          bindtap="selectMaxSize"
+        >{{item}}</button>
+      </view>
+    </view>
+
+    <view class="setting-block setting-block--bordered">
+      <view class="setting-heading">
+        <view class="setting-copy">
+          <text class="setting-label">最终色号上限</text>
+          <text class="setting-help">限制整张图最多使用多少种 Mard 拼豆色</text>
+        </view>
+        <view class="inline-control">
+          <text class="inline-label">不限</text>
+          <switch checked="{{unlimitedColors}}" color="#DF5965" bindchange="toggleUnlimitedColors" />
+        </view>
+      </view>
+      <view wx:if="{{!unlimitedColors}}" class="slider-row">
+        <slider
+          class="setting-slider"
+          min="4"
+          max="24"
+          step="1"
+          value="{{colorLimit}}"
+          activeColor="#DF5965"
+          backgroundColor="#DCE1E5"
+          block-color="#FFFFFF"
+          block-size="24"
+          bindchanging="changeColorLimit"
+          bindchange="changeColorLimit"
+        />
+        <text class="slider-value">{{colorLimit}} 色</text>
+      </view>
+    </view>
+
+    <view class="setting-block setting-block--bordered">
+      <view class="setting-copy setting-copy--full">
+        <text class="setting-label">相近色统一</text>
+        <text class="setting-help">仅统一颜色接近的像素，不限定最终色号数量</text>
+      </view>
+      <view class="segmented-control segmented-control--merge">
+        <button
+          wx:for="{{mergeOptions}}"
+          wx:key="value"
+          class="segment segment--merge {{mergeDistance === item.value ? 'segment--active' : ''}}"
+          data-value="{{item.value}}"
+          bindtap="selectMergeDistance"
+        >{{item.label}}</button>
+      </view>
+    </view>
+
+    <button class="advanced-toggle" bindtap="toggleAdvanced">
+      <text>细节处理</text>
+      <text class="advanced-symbol">{{advancedOpen ? '−' : '+'}}</text>
+    </button>
+
+    <view wx:if="{{advancedOpen}}" class="advanced-settings">
+      <view class="switch-row">
+        <text>简化外轮廓</text>
+        <switch checked="{{outlineSimplify}}" color="#DF5965" data-field="outlineSimplify" bindchange="changeBoolean" />
+      </view>
+      <view class="switch-row">
+        <text>恢复亮色细节</text>
+        <switch checked="{{brightDetailRecovery}}" color="#DF5965" data-field="brightDetailRecovery" bindchange="changeBoolean" />
+      </view>
+      <view class="switch-row">
+        <text>原图区域复核</text>
+        <switch checked="{{sourceCoverageRecovery}}" color="#DF5965" data-field="sourceCoverageRecovery" bindchange="changeBoolean" />
+      </view>
+      <view class="switch-row">
+        <text>净化近白杂色</text>
+        <switch checked="{{nearWhiteCleanup}}" color="#DF5965" data-field="nearWhiteCleanup" bindchange="changeBoolean" />
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{submitting}}" class="progress-panel">
+    <view class="progress-copy">
+      <text>正在生成图纸</text>
+      <text>{{uploadProgress}}%</text>
+    </view>
+    <progress percent="{{uploadProgress}}" stroke-width="4" activeColor="#DF5965" backgroundColor="#E0E4E8" />
+  </view>
+
+  <text wx:if="{{errorMessage}}" class="error-message">{{errorMessage}}</text>
+  <button
+    class="primary-button generate-button"
+    loading="{{submitting}}"
+    disabled="{{!imagePath || submitting}}"
+    bindtap="generatePattern"
+  >生成拼豆图纸</button>
+</view>

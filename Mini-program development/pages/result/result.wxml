@@ -1,0 +1,77 @@
+<view class="custom-navigation" style="padding-top: {{statusBarHeight}}px;">
+  <view class="custom-navigation__bar" style="height: {{navigationBarHeight}}px;">
+    <button class="navigation-back" hover-class="navigation-back--pressed" aria-label="返回" bindtap="backToEdit">
+      <view class="navigation-back__icon"></view>
+    </button>
+    <text class="custom-navigation__title">生成结果</text>
+  </view>
+</view>
+<view class="navigation-placeholder" style="height: {{navigationTotalHeight}}px;"></view>
+
+<view wx:if="{{result}}" class="page-shell result-page">
+  <view class="result-header">
+    <view>
+      <text class="result-title">拼豆图纸</text>
+      <text class="result-id">任务 {{shortJobId}}</text>
+    </view>
+    <text class="result-status">已生成</text>
+  </view>
+
+  <view class="stats-grid">
+    <view class="stat-item">
+      <text class="stat-value">{{result.width}} × {{result.height}}</text>
+      <text class="stat-label">图纸尺寸</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-value">{{result.bead_count}}</text>
+      <text class="stat-label">拼豆数量</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-value">{{result.color_count}}</text>
+      <text class="stat-label">使用颜色</text>
+    </view>
+  </view>
+
+  <view class="result-section image-section">
+    <view class="result-tabs">
+      <button class="result-tab {{activeTab === 'pattern' ? 'result-tab--active' : ''}}" data-tab="pattern" bindtap="selectTab">色号图纸</button>
+      <button class="result-tab {{activeTab === 'rgb' ? 'result-tab--active' : ''}}" data-tab="rgb" bindtap="selectTab">RGB 像素图</button>
+    </view>
+    <view class="pattern-preview" bindtap="previewCurrent">
+      <image class="pattern-image" src="{{currentImageUrl}}" mode="aspectFit" bindload="imageLoaded" />
+      <view wx:if="{{imageLoading}}" class="image-loading">加载中</view>
+    </view>
+  </view>
+
+  <view class="action-grid">
+    <button class="primary-button" loading="{{saving}}" disabled="{{saving}}" bindtap="saveCurrent">保存当前图片</button>
+    <button class="secondary-button" bindtap="copySummary">复制用量清单</button>
+  </view>
+
+  <view class="result-section palette-section">
+    <view class="palette-heading">
+      <text class="section-title">颜色用量</text>
+      <text class="palette-total">共 {{result.bead_count}} 颗</text>
+    </view>
+    <view class="palette-table">
+      <view wx:for="{{summary}}" wx:key="code" class="palette-row">
+        <view class="color-swatch" style="background: {{item.hex}};"></view>
+        <view class="color-main">
+          <text class="color-code">{{item.code}}</text>
+          <text class="color-name">{{item.name}}</text>
+        </view>
+        <view class="color-count">
+          <text>{{item.count}} 颗</text>
+          <text class="color-share">{{item.share}}%</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <button class="back-button" bindtap="backToEdit">返回调整参数</button>
+</view>
+
+<view wx:else class="empty-result">
+  <text class="empty-result__title">暂无生成结果</text>
+  <button class="primary-button" bindtap="backToEdit">返回选择图片</button>
+</view>
